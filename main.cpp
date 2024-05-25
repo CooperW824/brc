@@ -1,12 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
-#include <set>
-#include <sstream>
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include <unordered_set>
 
 typedef struct
 {
@@ -18,8 +15,7 @@ typedef struct
 
 void process_line(
     std::string &line,
-    std::unordered_map<std::string, measurements> &measures,
-    std::unordered_set<std::string> &locations);
+    std::unordered_map<std::string, measurements> &measures);
 
 void output_file(
     const std::unordered_map<std::string, measurements> &measures,
@@ -28,7 +24,6 @@ void output_file(
 int main()
 {
     std::unordered_map<std::string, measurements> measures(20000);
-    std::unordered_set<std::string> locations;
 
     std::ifstream file("measurements.txt");
     if (!file.is_open())
@@ -40,12 +35,13 @@ int main()
     std::string line;
     while (std::getline(file, line))
     {
-        process_line(line, measures, locations);
+        process_line(line, measures);
     }
 
+    // Sort the list of cities
     std::vector<std::string> tempList;
-    for(const std::string & str: locations) tempList.push_back(str);
-
+    for (const auto &city : measures)
+        tempList.push_back(city.first);
     std::sort(tempList.begin(), tempList.end());
 
     output_file(measures, tempList);
@@ -54,8 +50,7 @@ int main()
 
 void process_line(
     std::string &line,
-    std::unordered_map<std::string, measurements> &measures,
-    std::unordered_set<std::string> &locations)
+    std::unordered_map<std::string, measurements> &measures)
 {
     std::string tempString;
     while (line.back() != ';')
@@ -71,9 +66,7 @@ void process_line(
 
     double temp = std::stod(tempString);
 
-    auto emplace_result = locations.emplace(line);
-
-    if (emplace_result.second == true)
+    if (!(measures.count(line)))
     {
         // Means that we have not seen this city yet and can just insert it into the map
         measures.emplace(line, (measurements){temp, temp, temp, 1});
@@ -81,7 +74,7 @@ void process_line(
     else
     {
         // means we have seen this city and we need to adjust the measures
-        measurements & current = measures.at(line);
+        measurements &current = measures.at(line);
         current.sum += temp;
         current.count++;
 
@@ -98,11 +91,11 @@ void output_file(
     const std::unordered_map<std::string, measurements> &measures,
     const std::vector<std::string> &locations)
 {
-    measurements temp; 
+    measurements temp;
     std::ofstream out_file("output.txt");
     for (const std::string &location : locations)
     {
         temp = measures.at(location);
-        out_file << location <<";"<< temp.min <<";"<< std::ceil((temp.sum / temp.count)*10)/10 << ";" << temp.max << "\n";
+        out_file << location << ";" << temp.min << ";" << std::ceil((temp.sum / temp.count) * 10) / 10 << ";" << temp.max << "\n";
     }
 }
