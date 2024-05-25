@@ -61,7 +61,7 @@ void process_line(
 
     if (!(measures.count(line)))
     {
-        measures.emplace(line, std::vector<float>(temp));
+        measures.emplace(line, std::vector<float>(1, temp));
     }
     else
     {
