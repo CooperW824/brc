@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <regex>
 
 typedef struct
 {
@@ -52,19 +53,12 @@ void process_line(
     std::string &line,
     std::unordered_map<std::string, measurements> &measures)
 {
-    std::string tempString;
-    while (line.back() != ';')
-    {
-        tempString.push_back(line.back());
-        line.pop_back();
-    }
+    std::regex extractor("^(.*);([\\-0-9.]*)$");
+    std::smatch matches;
+    std::regex_search(line, matches, extractor);   
 
-    line.pop_back(); // Remove the semicolon
-
-    // Reverse the temp string because I assembled it backwards...
-    std::reverse(tempString.begin(), tempString.end());
-
-    float temp = std::stof(tempString);
+    float temp = std::stof(matches[2]);
+    line = matches[1];
 
     measurements &current = measures[line];
     current.sum += temp;
