@@ -1,3 +1,5 @@
 build
 measurements.txt
 output.txt
+gmon.out
+prof.txt

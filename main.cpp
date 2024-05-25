@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <unordered_set>
 
 typedef struct
 {
@@ -18,16 +19,16 @@ typedef struct
 void process_line(
     std::string &line,
     std::unordered_map<std::string, measurements> &measures,
-    std::set<std::string> &locations);
+    std::unordered_set<std::string> &locations);
 
 void output_file(
     const std::unordered_map<std::string, measurements> &measures,
-    const std::set<std::string> &locations);
+    const std::vector<std::string> &locations);
 
 int main()
 {
-    std::unordered_map<std::string, measurements> measures;
-    std::set<std::string> locations;
+    std::unordered_map<std::string, measurements> measures(20000);
+    std::unordered_set<std::string> locations;
 
     std::ifstream file("measurements.txt");
     if (!file.is_open())
@@ -42,14 +43,19 @@ int main()
         process_line(line, measures, locations);
     }
 
-    output_file(measures, locations);
+    std::vector<std::string> tempList;
+    for(const std::string & str: locations) tempList.push_back(str);
+
+    std::sort(tempList.begin(), tempList.end());
+
+    output_file(measures, tempList);
     return EXIT_SUCCESS;
 }
 
 void process_line(
     std::string &line,
     std::unordered_map<std::string, measurements> &measures,
-    std::set<std::string> &locations)
+    std::unordered_set<std::string> &locations)
 {
     std::string tempString;
     while (line.back() != ';')
@@ -87,12 +93,13 @@ void process_line(
     }
 }
 
+// Does not take much time
 void output_file(
     const std::unordered_map<std::string, measurements> &measures,
-    const std::set<std::string> &locations)
+    const std::vector<std::string> &locations)
 {
     measurements temp; 
-    std::ofstream out_file  =  std::ofstream("output.txt");
+    std::ofstream out_file("output.txt");
     for (const std::string &location : locations)
     {
         temp = measures.at(location);
