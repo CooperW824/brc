@@ -7,10 +7,10 @@
 
 typedef struct
 {
-    double sum;
-    double min;
-    double max;
-    int count;
+    float sum = 0;
+    float min = 0;
+    float max = 0;
+    int count = 0;
 } measurements;
 
 void process_line(
@@ -64,26 +64,17 @@ void process_line(
     // Reverse the temp string because I assembled it backwards...
     std::reverse(tempString.begin(), tempString.end());
 
-    double temp = std::stod(tempString);
+    float temp = std::stof(tempString);
 
-    if (!(measures.count(line)))
-    {
-        // Means that we have not seen this city yet and can just insert it into the map
-        measures.emplace(line, (measurements){temp, temp, temp, 1});
-    }
-    else
-    {
-        // means we have seen this city and we need to adjust the measures
-        measurements &current = measures.at(line);
-        current.sum += temp;
-        current.count++;
+    measurements &current = measures[line];
+    current.sum += temp;
+    current.count++;
 
-        if (current.max < temp)
-            current.max = temp;
+    if (current.max < temp)
+        current.max = temp;
 
-        if (current.min > temp)
-            current.min = temp;
-    }
+    if (current.min > temp)
+        current.min = temp;
 }
 
 // Does not take much time
