@@ -7,79 +7,79 @@
 
 typedef struct
 {
-    float sum = 0;
-    float min = 0;
-    float max = 0;
-    int count = 0;
+	float sum = 0;
+	float min = 0;
+	float max = 0;
+	int count = 0;
 } measurements;
 
 void process_line(
-    std::string &line,
-    std::unordered_map<std::string, measurements> &measures);
+		std::string &line,
+		std::unordered_map<std::string, measurements> &measures);
 
 void output_file(
-    const std::unordered_map<std::string, measurements> &measures,
-    const std::vector<std::string> &locations);
+		const std::unordered_map<std::string, measurements> &measures,
+		const std::vector<std::string> &locations);
 
 int main()
 {
-    std::unordered_map<std::string, measurements> measures(20000);
+	std::unordered_map<std::string, measurements> measures(20000);
 
-    std::ifstream file("measurements.txt");
-    if (!file.is_open())
-    {
-        std::cerr << "Error: measurements file not found" << std::endl;
-        return EXIT_FAILURE;
-    }
+	std::ifstream file("measurements.txt");
+	if (!file.is_open())
+	{
+		std::cerr << "Error: measurements file not found" << std::endl;
+		return EXIT_FAILURE;
+	}
 
-    std::string line;
-    while (std::getline(file, line))
-    {
-        process_line(line, measures);
-    }
+	std::string line;
+	while (std::getline(file, line))
+	{
+		process_line(line, measures);
+	}
 
-    // Sort the list of cities
-    std::vector<std::string> tempList;
-    for (const auto &city : measures)
-        tempList.push_back(city.first);
-    std::sort(tempList.begin(), tempList.end());
+	// Sort the list of cities
+	std::vector<std::string> tempList;
+	for (const auto &city : measures)
+		tempList.push_back(city.first);
+	std::sort(tempList.begin(), tempList.end());
 
-    output_file(measures, tempList);
-    return EXIT_SUCCESS;
+	output_file(measures, tempList);
+	return EXIT_SUCCESS;
 }
 
 void process_line(
-    std::string &line,
-    std::unordered_map<std::string, measurements> &measures)
+		std::string &line,
+		std::unordered_map<std::string, measurements> &measures)
 {
-    char city[101];
-    float temp;
+	char city[101];
+	float temp;
 
-    sscanf(line.c_str(), "%[^;];%f", city, &temp);
+	sscanf(line.c_str(), "%[^;];%f", city, &temp);
 
-    line = city;
+	line = city;
 
-    measurements &current = measures[line];
-    current.sum += temp;
-    current.count++;
+	measurements &current = measures[line];
+	current.sum += temp;
+	current.count++;
 
-    if (current.max < temp)
-        current.max = temp;
+	if (current.max < temp)
+		current.max = temp;
 
-    if (current.min > temp)
-        current.min = temp;
+	if (current.min > temp)
+		current.min = temp;
 }
 
 // Does not take much time
 void output_file(
-    const std::unordered_map<std::string, measurements> &measures,
-    const std::vector<std::string> &locations)
+		const std::unordered_map<std::string, measurements> &measures,
+		const std::vector<std::string> &locations)
 {
-    measurements temp;
-    std::ofstream out_file("output.txt");
-    for (const std::string &location : locations)
-    {
-        temp = measures.at(location);
-        out_file << location << ";" << temp.min << ";" << std::ceil((temp.sum / temp.count) * 10) / 10 << ";" << temp.max << "\n";
-    }
+	measurements temp;
+	std::ofstream out_file("output.txt");
+	for (const std::string &location : locations)
+	{
+		temp = measures.at(location);
+		out_file << location << ";" << temp.min << ";" << std::ceil((temp.sum / temp.count) * 10) / 10 << ";" << temp.max << "\n";
+	}
 }
