@@ -28,7 +28,7 @@ int main()
     std::ifstream file("measurements.txt");
     if (!file.is_open())
     {
-        std::cerr << "Error: file not found" << std::endl;
+        std::cerr << "Error: measurements file not found" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -52,19 +52,12 @@ void process_line(
     std::string &line,
     std::unordered_map<std::string, measurements> &measures)
 {
-    std::string tempString;
-    while (line.back() != ';')
-    {
-        tempString.push_back(line.back());
-        line.pop_back();
-    }
+    char city[101];
+    float temp;
 
-    line.pop_back(); // Remove the semicolon
+    sscanf(line.c_str(), "%[^;];%f", city, &temp);
 
-    // Reverse the temp string because I assembled it backwards...
-    std::reverse(tempString.begin(), tempString.end());
-
-    float temp = std::stof(tempString);
+    line = city;
 
     measurements &current = measures[line];
     current.sum += temp;
