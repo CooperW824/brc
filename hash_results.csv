@@ -1,0 +1,4 @@
+Hash   ,Table Size ,Time
+DJB2   ,      2636 ,
+FNV    ,      2982 ,
+Coffin ,      3819
